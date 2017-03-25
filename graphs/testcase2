@@ -1,0 +1,14 @@
+# Nodes(must identified by int nums)
+1 2 3 4 5 6 7
+# Start Nodes
+1
+# End Nodes
+7
+# Edges('-1' means the node has no out-degree)
+2 7
+3 4
+2
+5 6
+6
+1
+-1
