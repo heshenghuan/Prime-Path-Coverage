@@ -9,6 +9,7 @@ http://github.com/heshenghuan
 
 import sys
 import codecs as cs
+from kmp import KMP
 
 
 def readGraphFromFile(src):
@@ -81,13 +82,15 @@ def findPrimePaths(graph):
     # sort the simple paths by length
     simplePaths = sorted(simplePaths, reverse=True, key=lambda a: len(a))
     # add the longest simple path to prime path
-    primePaths = [", ".join(str(n) for n in simplePaths[0])]
+    # primePaths = [", ".join(str(n) for n in simplePaths[0])]
+    primePaths = [simplePaths[0]]
     for p in simplePaths[1:]:
-        p = ", ".join(str(n) for n in p)
+        # p = ", ".join(str(n) for n in p)
 
         def isSubPath(x):
             """whether p is a subpath of exist prime paths"""
-            return (p in x)
+            # return (p in x)
+            return KMP(x, p)
 
         # decide whether to add p to prime path
         # in py3 should import reduce first
@@ -99,7 +102,7 @@ def findPrimePaths(graph):
     print "Prime Paths of this graph(%d):" % len(primePaths)
     primePaths = sorted(primePaths, key=lambda a: (len(a), a))
     for i, p in enumerate(primePaths):
-        print 'Path %2d: (%s)' % (i + 1, p)
+        print 'Path %2d: %s' % (i + 1, p)
 
 
 def usage():
