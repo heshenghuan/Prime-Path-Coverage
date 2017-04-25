@@ -1,0 +1,5 @@
+# Python compile file
+*.pyc
+
+# Graph example files
+graphs/*
