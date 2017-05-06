@@ -9,7 +9,6 @@ http://github.com/heshenghuan
 
 import sys
 import codecs as cs
-from kmp import KMP
 
 
 def readGraphFromFile(src):
@@ -30,7 +29,7 @@ def readGraphFromFile(src):
         for i in nodes:
             s = graphFile.readline().strip().split()
             if len(s) >= 1:
-                edges[i] = [int(n) for n in s]
+                edges[i] = [int(n) for n in s if n != '-1']
             else:
                 edges[i] = []
         graph = {'nodes': nodes, 'init': initNodes,
@@ -48,27 +47,58 @@ def printGraph(graph):
         print "%d to " % n, graph['edges'][n]
 
 
+def isPrimePath(path, graph):
+    """Whether a path is a prime path."""
+    if len(path) > 2 and path[0] == path[-1]:
+        return True
+    elif reachHead(path, graph) and reachEnd(path, graph):
+        return True
+    else:
+        return False
+
+
+def reachHead(path, graph):
+    """
+    Whether the path can be extended at head, and the extended path is still
+    a simple path.
+    """
+    former_nodes = filter(lambda n: path[0] in graph[
+                          'edges'][n], graph['nodes'])
+    for n in former_nodes:
+        if n not in path or n == path[-1]:
+            return False
+    return True
+
+
+def reachEnd(path, graph):
+    """
+    Whether the path can be extended at tail, and the extended path is still
+    a simple path.
+    """
+    later_nodes = graph['edges'][path[-1]]
+    for n in later_nodes:
+        if n not in path or n == path[0]:
+            return False
+    return True
+
+
+def extendable(path, graph):
+    """Whether a path is extendable."""
+    if isPrimePath(path, graph) or reachEnd(path, graph):
+        return False
+    else:
+        return True
+
+
 def findSimplePath(graph, exPaths, paths=[]):
     """Find the simple paths of a graph."""
+    paths.extend(filter(lambda p: isPrimePath(p, graph), exPaths))
+    exPaths = filter(lambda p: extendable(p, graph), exPaths)
     newExPaths = []
     for p in exPaths:
-        # whether simple path's last node is not the end node
-        if p[-1] not in graph['end']:
-            # whether simple path's last node is the first node
-            if p[-1] == p[0] and (len(p) - 1) >= 1:
-                paths.append(p)
-                continue
-            # whether simple path has a inner loop
-            if p[-1] in p[1:-1] and (len(p) - 1) >= 1:
-                # there is a inner loop
-                # without the last node it might be a prime path
-                paths.append(p[:-1])
-            else:
-                for nx in graph['edges'][p[-1]]:
-                    newExPaths.append(p + (nx, ))
-        else:
-            if (len(p) - 1) >= 1:
-                paths.append(p)
+        for nx in graph['edges'][p[-1]]:
+            if nx not in p or nx == p[0]:
+                newExPaths.append(p + (nx, ))
     if len(newExPaths) > 0:
         findSimplePath(graph, newExPaths, paths)
 
@@ -79,30 +109,10 @@ def findPrimePaths(graph):
     simplePaths = []
     # recursively finding the simple paths of the graph
     findSimplePath(graph, exPaths, simplePaths)
-    # sort the simple paths by length
-    simplePaths = sorted(simplePaths, reverse=True, key=lambda a: len(a))
-    # add the longest simple path to prime path
-    # primePaths = [", ".join(str(n) for n in simplePaths[0])]
-    primePaths = [simplePaths[0]]
-    for p in simplePaths[1:]:
-        # p = ", ".join(str(n) for n in p)
-
-        def isSubPath(x):
-            """whether p is a subpath of exist prime paths"""
-            # return (p in x)
-            return KMP(x, p)
-
-        # decide whether to add p to prime path
-        # in py3 should import reduce first
-        flag = map(isSubPath, primePaths)
-        flag = reduce(lambda x, y: x or y, flag)
-        if not flag:
-            primePaths.append(p)
-
-    print "Prime Paths of this graph(%d):" % len(primePaths)
-    primePaths = sorted(primePaths, key=lambda a: (len(a), a))
-    for i, p in enumerate(primePaths):
-        print 'Path %2d: %s' % (i + 1, p)
+    primePaths = sorted(simplePaths, key=lambda a: (len(a), a))
+    print len(primePaths)
+    for p in primePaths:
+        print list(p)
 
 
 def usage():
@@ -119,5 +129,5 @@ if __name__ == "__main__":
         sys.exit(-1)
     graphFile = sys.argv[1]
     graph = readGraphFromFile(graphFile)
-    printGraph(graph)
+    # printGraph(graph)
     findPrimePaths(graph)
