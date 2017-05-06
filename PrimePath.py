@@ -49,7 +49,7 @@ def printGraph(graph):
 
 def isPrimePath(path, graph):
     """Whether a path is a prime path."""
-    if len(path) > 2 and path[0] == path[-1]:
+    if len(path) >= 2 and path[0] == path[-1]:
         return True
     elif reachHead(path, graph) and reachEnd(path, graph):
         return True
