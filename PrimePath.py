@@ -6,7 +6,7 @@ Created on Wed Mar 22 2017
 @author: heshenghuan (heshenghuan@sina.com)
 http://github.com/heshenghuan
 """
-
+from draw_graph import *
 import sys
 import codecs as cs
 
@@ -39,12 +39,12 @@ def readGraphFromFile(src):
 
 def printGraph(graph):
     """Print a graph structure information."""
-    print "Nodes:     ", graph['nodes']
-    print "InitNodes: ", graph['init']
-    print "EndNodes:  ", graph['end']
-    print "Edges:"
+    print ("Nodes:     ", graph['nodes'])
+    print ("InitNodes: ", graph['init'])
+    print ("EndNodes:  ", graph['end'])
+    print ("Edges:")
     for n in graph['nodes']:
-        print "%d to " % n, graph['edges'][n]
+        print ("%d to " % n, graph['edges'][n])
 
 
 def isPrimePath(path, graph):
@@ -110,24 +110,25 @@ def findPrimePaths(graph):
     # recursively finding the simple paths of the graph
     findSimplePath(graph, exPaths, simplePaths)
     primePaths = sorted(simplePaths, key=lambda a: (len(a), a))
-    print len(primePaths)
+    print(len(primePaths))
     for p in primePaths:
-        print list(p)
+        print(list(p))
 
 
 def usage():
-    print "Finding The Prime Paths."
-    print "Please make sure the format of graph file is correct."
-    print "The results cannot be guaranteed if the format is incorrect.\n",
-    print "Usage: python PrimePath.py GRAPH"
-    print "       GRAPH The file defined graph"
+    print ("Finding The Prime Paths.")
+    print ("Please make sure the format of graph file is correct.")
+    print ("The results cannot be guaranteed if the format is incorrect.\n",)
+    print ("Usage: python PrimePath.py GRAPH")
+    print ("       GRAPH The file defined graph")
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print "Arguments Error!"
+        print ("Arguments Error!")
         usage()
         sys.exit(-1)
     graphFile = sys.argv[1]
     graph = readGraphFromFile(graphFile)
     # printGraph(graph)
     findPrimePaths(graph)
+    draw(graph)
